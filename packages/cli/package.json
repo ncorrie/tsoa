@@ -66,5 +66,6 @@
   "engineStrict": true,
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "gitHead": "7f79dc56451aafb94cdb2bb1e134720eef1586d5"
 }
