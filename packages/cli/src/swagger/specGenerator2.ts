@@ -78,9 +78,16 @@ export class SpecGenerator2 extends SpecGenerator {
 
   private buildDefinitions() {
     const definitions: { [definitionsName: string]: Swagger.Schema2 } = {};
-    Object.keys(this.metadata.referenceTypeMap).map(typeName => {
+
+    Object.keys(this.metadata.referenceTypeMap).forEach(typeName => {
       const referenceType = this.metadata.referenceTypeMap[typeName];
+      console.log('referenceType', referenceType)
+
       if (referenceType.dataType === 'refObject') {
+        if (typeof referenceType.properties === 'undefined') {
+          return;
+        }
+
         const required = referenceType.properties.filter(p => p.required && !this.hasUndefined(p)).map(p => p.name);
         definitions[referenceType.refName] = {
           description: referenceType.description,
@@ -483,7 +490,19 @@ export class SpecGenerator2 extends SpecGenerator {
   }
 
   protected getSwaggerTypeForReferenceType(referenceType: Tsoa.ReferenceType): Swagger.BaseSchema {
-    return { $ref: `#/definitions/${referenceType.refName}` };
+    let refName: string = referenceType.refName;
+
+    const isAnObservableType = refName.includes('Observable_') && refName.charAt(refName.length - 1) === '_';
+    console.log('isAnObservableType', isAnObservableType)
+    if (isAnObservableType) {
+      let newText = refName.slice(0, -1) //'abcde'
+      newText = newText.replace('Observable_', '');
+
+      // replacing the soft ref. to the class
+      refName = newText;
+    }
+
+    return {$ref: `#/definitions/${refName}`};
   }
 
   private decideEnumType(anEnum: Array<string | number>, nameOfEnum: string): 'string' | 'number' {

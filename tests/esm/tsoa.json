@@ -21,7 +21,6 @@
         }
       }
     },
-    "yaml": true,
     "specVersion": 2
   },
   "routes": {
